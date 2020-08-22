@@ -166,6 +166,7 @@ String getEncryption(uint8_t network) {
 }
 
 int isOnFile(String mac) {
+  Serial.println("We're at least hitting the HAVE YOU SEEN THIS NETWORK eval");
   M5.Lcd.print("We're at least hitting the HAVE YOU SEEN THIS NETWORK eval");
   File netFile = SD.open(logFileName);
   String currentNetwork;
@@ -182,11 +183,14 @@ int isOnFile(String mac) {
       }
     }
     netFile.close();
+    Serial.println("We dont think we've seen this network before");
     M5.Lcd.println("We dont think we've seen this network before");
     M5.Lcd.print("The index of the network is: ");
     M5.Lcd.println(currentNetwork.indexOf(mac));
     return currentNetwork.indexOf(mac);
   }
+  Serial.println("netFile was not true");
+  M5.Lcd.print("netFile was not true");
 }
 
 void printHeader() {
@@ -211,6 +215,10 @@ void updateFileName() {
     memset(logFileName, 0, strlen(logFileName));
     sprintf(logFileName, "%s%d.%s", LOG_FILE_PREFIX, i, LOG_FILE_SUFFIX);
     if (!SD.exists(logFileName)) {
+      Serial.println("we picked a new file name");
+      Serial.println(logFileName);
+      M5.Lcd.println("we picked a new file name");
+      M5.Lcd.println(logFileName);
       break;
     } else {
       Serial.print(logFileName);
