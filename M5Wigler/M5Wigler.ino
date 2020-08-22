@@ -1,11 +1,11 @@
+
 #include <SPI.h>
 #include <Wire.h>
 #include <TinyGPS++.h>
 #include <M5Stack.h>
 #include "WiFi.h"
-
-
-#define ARDUINO_USD_CS 15
+#include <SD.h>
+#define ARDUINO_USD_CS 4
 #define LOG_FILE_PREFIX "gpslog"
 #define MAX_LOG_FILES 100
 #define LOG_FILE_SUFFIX "csv"
@@ -31,14 +31,15 @@ void setup() {
   ss.begin(9600);
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
+  
   if (!SD.begin(ARDUINO_USD_CS)) {
-    M5.Lcd.setTextSize(3);
+    
     M5.Lcd.println("SD card error");
     M5.Lcd.println("Error initializing SD card.");
     while(true)
       delay(100);
   }
-  M5.Lcd.setTextSize(3);
+  
   M5.Lcd.println("SD card OK!");
   delay(500);
   updateFileName();
@@ -58,7 +59,7 @@ void loop() {
         M5.Lcd.print(" Lng: ");
         M5.Lcd.println(tinyGPS.location.lng(), 3);
         
-      } else {
+       } else {
         Serial.print("Location invalid. Satellite count: ");
         Serial.println(tinyGPS.satellites.value());
         screenWipe();
@@ -83,43 +84,22 @@ static void smartDelay(unsigned long ms) {
   } while (millis() - start < ms);
 }
 
-void screenWipe() {
-  M5.Lcd.setTextSize(3);
-  M5.Lcd.fillScreen(BLACK);
-  M5.Lcd.setCursor(0, 0);
-}
-
 
 void lookForNetworks() {
   int n = WiFi.scanNetworks();
   if (n == 0) {
+    Serial.println("No networks found");
     Serial.println("No networks found");
     M5.Lcd.fillScreen(RED);
   } else {
     for (uint8_t i = 0; i <= n; ++i) {
       if ((isOnFile(WiFi.BSSIDstr(i)) == -1) && (WiFi.channel(i) > 0) && (WiFi.channel(i) < 15)) { //Avoid erroneous channels
         totalNetworks++;
-        M5.Speaker.tone(900, 1000);//play a tone for each new network found
         File logFile = SD.open(logFileName, FILE_WRITE);
         Serial.print("New network found ");
         Serial.println(WiFi.BSSIDstr(i));
-        M5.Lcd.setCursor(0,10);
+        M5.Lcd.setCursor(0,6);
         M5.Lcd.print("New:");
-
-        Serial.print("Network name: ");
-        Serial.println(WiFi.SSID(i));
- 
-        Serial.print("Signal strength: ");
-        Serial.println(WiFi.RSSI(i));
- 
-        Serial.print("MAC address: ");
-        Serial.println(WiFi.BSSIDstr(i));
- 
-       
-
-
-
-        
         String SSID = WiFi.SSID(i);
         M5.Lcd.println(SSID);
         logFile.print(WiFi.BSSIDstr(i));
@@ -226,4 +206,10 @@ void updateFileName() {
   }
   Serial.print("File name: ");
   Serial.println(logFileName);
+}
+
+void screenWipe() {
+  M5.Lcd.setTextSize(3);
+  M5.Lcd.fillScreen(BLACK);
+  M5.Lcd.setCursor(0, 0);
 }
