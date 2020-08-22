@@ -11,6 +11,7 @@
 #define LOG_FILE_SUFFIX "csv"
 #define LOG_COLUMN_COUNT 11
 #define LOG_RATE 500
+#define NOTE_DH2 661
 
 char logFileName[13];
 int totalNetworks = 0;
@@ -53,11 +54,11 @@ void loop() {
         screenWipe();
         M5.Lcd.print("Nets: ");
         M5.Lcd.println(totalNetworks);
-        M5.Lcd.print(" Sats: ");
+        M5.Lcd.print("Sats: ");
         M5.Lcd.println(tinyGPS.satellites.value());
         M5.Lcd.print("Lat: ");
         M5.Lcd.println(tinyGPS.location.lat(), 3);
-        M5.Lcd.print(" Lng: ");
+        M5.Lcd.print("Lng: ");
         M5.Lcd.println(tinyGPS.location.lng(), 3);
         
        } else {
@@ -101,9 +102,10 @@ void lookForNetworks() {
         File logFile = SD.open(logFileName, FILE_WRITE);
         Serial.print("New network found ");
         Serial.println(WiFi.BSSIDstr(i));
-        M5.Lcd.setCursor(0,6);
+        M5.Lcd.setCursor(0,110);
         M5.Lcd.println("New Networks:");
         String SSID = WiFi.SSID(i);
+        M5.Lcd.setCursor(0,130);
         M5.Lcd.println(SSID);
         logFile.print(WiFi.BSSIDstr(i));
         logFile.print(',');
@@ -144,6 +146,7 @@ void lookForNetworks() {
       }
     }
   }
+   //M5.Speaker.tone(NOTE_DH2, 20);
 }
 
 String getEncryption(uint8_t network) {
@@ -216,12 +219,12 @@ void updateFileName() {
       //M5.Lcd.println(logFileName);
       break;
     } else {
-      //Serial.print(logFileName);
-      //Serial.println(" exists");
+      Serial.print(logFileName);
+      Serial.println(" exists");
     }
   }
-  //Serial.print("File name: ");
-  //Serial.println(logFileName);
+  M5.Lcd.println("File name: ");
+  M5.Lcd.println(logFileName);
 }
 
 void screenWipe() {
