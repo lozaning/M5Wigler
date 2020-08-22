@@ -24,6 +24,7 @@ char * log_col_names[LOG_COLUMN_COUNT] = {
 
 TinyGPSPlus tinyGPS;
 HardwareSerial ss(2);
+File root;
 
 void setup() {
   M5.begin();
@@ -41,13 +42,16 @@ void setup() {
   }
   
   M5.Lcd.println("SD card OK!");
+  root = SD.open("/");
+  printDirectory(root, 0);
   delay(500);
   updateFileName();
   printHeader();
+  printDirectory(root, 0);
 }
 
 void loop() {
-      if (tinyGPS.location.isValid()) {
+      if (true) {
         lookForNetworks();
         screenWipe();
         M5.Lcd.print("Nets: ");
@@ -93,6 +97,8 @@ void lookForNetworks() {
     M5.Lcd.fillScreen(RED);
   } else {
     for (uint8_t i = 0; i <= n; ++i) {
+      Serial.print("Network name: ");
+      Serial.println(WiFi.SSID(i));
       if ((isOnFile(WiFi.BSSIDstr(i)) == -1) && (WiFi.channel(i) > 0) && (WiFi.channel(i) < 15)) { //Avoid erroneous channels
         totalNetworks++;
         File logFile = SD.open(logFileName, FILE_WRITE);
@@ -160,6 +166,7 @@ String getEncryption(uint8_t network) {
 }
 
 int isOnFile(String mac) {
+  M5.Lcd.print("We're at least hitting the HAVE YOU SEEN THIS NETWORK eval");
   File netFile = SD.open(logFileName);
   String currentNetwork;
   if (netFile) {
@@ -168,10 +175,16 @@ int isOnFile(String mac) {
       if (currentNetwork.indexOf(mac) != -1) {
         Serial.println("The network was already found");
         netFile.close();
+        M5.Lcd.print("We think we already found this network debug????");
+        M5.Lcd.print("The index of the network is: ");
+        M5.Lcd.println(currentNetwork.indexOf(mac));
         return currentNetwork.indexOf(mac);
       }
     }
     netFile.close();
+    M5.Lcd.println("We dont think we've seen this network before");
+    M5.Lcd.print("The index of the network is: ");
+    M5.Lcd.println(currentNetwork.indexOf(mac));
     return currentNetwork.indexOf(mac);
   }
 }
@@ -212,4 +225,28 @@ void screenWipe() {
   M5.Lcd.setTextSize(3);
   M5.Lcd.fillScreen(BLACK);
   M5.Lcd.setCursor(0, 0);
+}
+
+void printDirectory(File dir, int numTabs) {
+  while (true) {
+
+    File entry =  dir.openNextFile();
+    if (! entry) {
+      // no more files
+      break;
+    }
+    for (uint8_t i = 0; i < numTabs; i++) {
+      Serial.print('\t');
+    }
+    Serial.print(entry.name());
+    if (entry.isDirectory()) {
+      Serial.println("/");
+      printDirectory(entry, numTabs + 1);
+    } else {
+      // files have sizes, directories do not
+      Serial.print("\t\t");
+      Serial.println(entry.size(), DEC);
+    }
+    entry.close();
+  }
 }
