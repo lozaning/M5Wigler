@@ -48,7 +48,7 @@ void setup() {
 void loop() {
       if (tinyGPS.location.isValid()) {
         lookForNetworks();
-        screenWipe()
+        screenWipe();
         M5.Lcd.print("Nets: ");
         M5.Lcd.println(totalNetworks);
         M5.Lcd.print(" Sats: ");
@@ -61,14 +61,14 @@ void loop() {
       } else {
         Serial.print("Location invalid. Satellite count: ");
         Serial.println(tinyGPS.satellites.value());
-        screenWipe()
+        screenWipe();
         M5.Lcd.println("GPS not locked");
         M5.Lcd.print("Sats: ");
         M5.Lcd.println(tinyGPS.satellites.value());
         M5.Lcd.print("Charecters Processsed: ");
         M5.Lcd.println(tinyGPS.charsProcessed());
         M5.Lcd.print("Sentences With Fix: ");
-        M5.Lcd.println(tinyGPSsentencesWithFix());
+        M5.Lcd.println(tinyGPS.sentencesWithFix());
         M5.Lcd.print("Failed Checksum: ");
         M5.Lcd.println(tinyGPS.failedChecksum());
       }
