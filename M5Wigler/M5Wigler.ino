@@ -105,6 +105,21 @@ void lookForNetworks() {
         Serial.println(WiFi.BSSIDstr(i));
         M5.Lcd.setCursor(0,10);
         M5.Lcd.print("New:");
+
+        Serial.print("Network name: ");
+        Serial.println(WiFi.SSID(i));
+ 
+        Serial.print("Signal strength: ");
+        Serial.println(WiFi.RSSI(i));
+ 
+        Serial.print("MAC address: ");
+        Serial.println(WiFi.BSSIDstr(i));
+ 
+       
+
+
+
+        
         String SSID = WiFi.SSID(i);
         M5.Lcd.println(SSID);
         logFile.print(WiFi.BSSIDstr(i));
