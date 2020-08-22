@@ -48,7 +48,7 @@ void setup() {
 }
 
 void loop() {
-      if (true) {
+      if (tinyGPS.location.isValid()) {
         lookForNetworks();
         screenWipe();
         M5.Lcd.print("Nets: ");
@@ -102,7 +102,7 @@ void lookForNetworks() {
         Serial.print("New network found ");
         Serial.println(WiFi.BSSIDstr(i));
         M5.Lcd.setCursor(0,6);
-        M5.Lcd.print("New:");
+        M5.Lcd.println("New Networks:");
         String SSID = WiFi.SSID(i);
         M5.Lcd.println(SSID);
         logFile.print(WiFi.BSSIDstr(i));
@@ -163,8 +163,6 @@ String getEncryption(uint8_t network) {
 }
 
 int isOnFile(String mac) {
-  Serial.println("We're at least hitting the HAVE YOU SEEN THIS NETWORK eval");
-  M5.Lcd.print("We're at least hitting the HAVE YOU SEEN THIS NETWORK eval");
   File netFile = SD.open(logFileName);
   String currentNetwork;
   if (netFile) {
@@ -173,21 +171,21 @@ int isOnFile(String mac) {
       if (currentNetwork.indexOf(mac) != -1) {
         Serial.println("The network was already found");
         netFile.close();
-        M5.Lcd.print("We think we already found this network debug????");
-        M5.Lcd.print("The index of the network is: ");
-        M5.Lcd.println(currentNetwork.indexOf(mac));
+        //M5.Lcd.print("We think we already found this network debug????");
+        //M5.Lcd.print("The index of the network is: ");
+        //M5.Lcd.println(currentNetwork.indexOf(mac));
         return currentNetwork.indexOf(mac);
       }
     }
     netFile.close();
-    Serial.println("We dont think we've seen this network before");
-    M5.Lcd.println("We dont think we've seen this network before");
-    M5.Lcd.print("The index of the network is: ");
-    M5.Lcd.println(currentNetwork.indexOf(mac));
+    //Serial.println("We dont think we've seen this network before");
+    //M5.Lcd.println("We dont think we've seen this network before");
+    //M5.Lcd.print("The index of the network is: ");
+    //M5.Lcd.println(currentNetwork.indexOf(mac));
     return currentNetwork.indexOf(mac);
   }
-  Serial.println("netFile was not true");
-  M5.Lcd.print("netFile was not true");
+  //Serial.println("netFile was not true");
+  //M5.Lcd.print("netFile was not true");
 }
 
 void printHeader() {
@@ -212,46 +210,22 @@ void updateFileName() {
     memset(logFileName, 0, strlen(logFileName));
     sprintf(logFileName, "%s%d.%s", LOG_FILE_PREFIX, i, LOG_FILE_SUFFIX);
     if (!SD.exists(logFileName)) {
-      Serial.println("we picked a new file name");
-      Serial.println(logFileName);
-      M5.Lcd.println("we picked a new file name");
-      M5.Lcd.println(logFileName);
+      //Serial.println("we picked a new file name");
+      //Serial.println(logFileName);
+      //M5.Lcd.println("we picked a new file name");
+      //M5.Lcd.println(logFileName);
       break;
     } else {
-      Serial.print(logFileName);
-      Serial.println(" exists");
+      //Serial.print(logFileName);
+      //Serial.println(" exists");
     }
   }
-  Serial.print("File name: ");
-  Serial.println(logFileName);
+  //Serial.print("File name: ");
+  //Serial.println(logFileName);
 }
 
 void screenWipe() {
   M5.Lcd.setTextSize(3);
   M5.Lcd.fillScreen(BLACK);
   M5.Lcd.setCursor(0, 0);
-}
-
-void printDirectory(File dir, int numTabs) {
-  while (true) {
-
-    File entry =  dir.openNextFile();
-    if (! entry) {
-      // no more files
-      break;
-    }
-    for (uint8_t i = 0; i < numTabs; i++) {
-      Serial.print('\t');
-    }
-    Serial.print(entry.name());
-    if (entry.isDirectory()) {
-      Serial.println("/");
-      printDirectory(entry, numTabs + 1);
-    } else {
-      // files have sizes, directories do not
-      Serial.print("\t\t");
-      Serial.println(entry.size(), DEC);
-    }
-    entry.close();
-  }
 }
