@@ -6,7 +6,7 @@
 #include "WiFi.h"
 #include <SD.h>
 #define ARDUINO_USD_CS 4
-#define LOG_FILE_PREFIX "gpslog"
+#define LOG_FILE_PREFIX "/gpslog"
 #define MAX_LOG_FILES 100
 #define LOG_FILE_SUFFIX "csv"
 #define LOG_COLUMN_COUNT 11
@@ -42,12 +42,9 @@ void setup() {
   }
   
   M5.Lcd.println("SD card OK!");
-  root = SD.open("/");
-  printDirectory(root, 0);
   delay(500);
   updateFileName();
   printHeader();
-  printDirectory(root, 0);
 }
 
 void loop() {
