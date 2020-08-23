@@ -99,7 +99,7 @@ void lookForNetworks() {
       Serial.println(WiFi.SSID(i));
       if ((isOnFile(WiFi.BSSIDstr(i)) == -1) && (WiFi.channel(i) > 0) && (WiFi.channel(i) < 15)) { //Avoid erroneous channels
         totalNetworks++;
-        File logFile = SD.open(logFileName, FILE_WRITE);
+        File logFile = SD.open(logFileName, FILE_APPEND);
         Serial.print("New network found ");
         Serial.println(WiFi.BSSIDstr(i));
         M5.Lcd.setCursor(0,110);
@@ -112,6 +112,12 @@ void lookForNetworks() {
         SSID = WiFi.SSID(i);
         // Commas in SSID brokes the csv file padding
         SSID.replace(",", ".");
+        if(logFile.print(SSID)){
+          Serial.println("************************************************************************Message appended");
+    } else {
+        Serial.println("******************************************************************************Append failed");
+    
+        }
         logFile.print(SSID);
         logFile.print(',');
         logFile.print(getEncryption(i));
@@ -173,29 +179,32 @@ int isOnFile(String mac) {
       currentNetwork = netFile.readStringUntil('\n');
       if (currentNetwork.indexOf(mac) != -1) {
         Serial.println("The network was already found");
+        Serial.println("The network was already found");
+        Serial.println("The network was already found");
+        Serial.println("******************************************************************");
         netFile.close();
-        //M5.Lcd.print("We think we already found this network debug????");
-        //M5.Lcd.print("The index of the network is: ");
-        //M5.Lcd.println(currentNetwork.indexOf(mac));
+        M5.Lcd.print("We think we already found this network debug????");
+        M5.Lcd.print("The index of the network is: ");
+        M5.Lcd.println(currentNetwork.indexOf(mac));
         return currentNetwork.indexOf(mac);
       }
     }
     netFile.close();
-    //Serial.println("We dont think we've seen this network before");
-    //M5.Lcd.println("We dont think we've seen this network before");
-    //M5.Lcd.print("The index of the network is: ");
-    //M5.Lcd.println(currentNetwork.indexOf(mac));
+    Serial.println("We dont think we've seen this network before");
+    M5.Lcd.println("We dont think we've seen this network before");
+    M5.Lcd.print("The index of the network is: ");
+    M5.Lcd.println(currentNetwork.indexOf(mac));
     return currentNetwork.indexOf(mac);
   }
-  //Serial.println("netFile was not true");
-  //M5.Lcd.print("netFile was not true");
+  Serial.println("netFile was not true");
+  M5.Lcd.print("netFile was not true");
 }
 
 void printHeader() {
   File logFile = SD.open(logFileName, FILE_WRITE);
   if (logFile) {
     int i = 0;
-    // logFile.println(wigleHeaderFileFormat); // comment out to disable Wigle header
+    logFile.println(wigleHeaderFileFormat); // comment out to disable Wigle header
     for (; i < LOG_COLUMN_COUNT; i++) {
       logFile.print(log_col_names[i]);
       if (i < LOG_COLUMN_COUNT - 1)
