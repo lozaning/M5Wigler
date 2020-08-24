@@ -103,6 +103,8 @@ void lookForNetworks() {
         Serial.print("New network found ");
         Serial.println(WiFi.BSSIDstr(i));
         M5.Lcd.setCursor(0,110);
+        M5.Lcd.println("                                                         ");//clear the part of the LCD we're going to write the next ssid to
+        M5.Lcd.setCursor(0,110);
         M5.Lcd.println("New Networks:");
         String SSID = WiFi.SSID(i);
         M5.Lcd.setCursor(0,130);
@@ -178,26 +180,26 @@ int isOnFile(String mac) {
     while (netFile.available()) {
       currentNetwork = netFile.readStringUntil('\n');
       if (currentNetwork.indexOf(mac) != -1) {
-        Serial.println("The network was already found");
-        Serial.println("The network was already found");
-        Serial.println("The network was already found");
-        Serial.println("******************************************************************");
+        //Serial.println("The network was already found");
+        //Serial.println("The network was already found");
+        //Serial.println("The network was already found");
+        //Serial.println("******************************************************************");
         netFile.close();
-        M5.Lcd.print("We think we already found this network debug????");
-        M5.Lcd.print("The index of the network is: ");
-        M5.Lcd.println(currentNetwork.indexOf(mac));
+        //M5.Lcd.print("We think we already found this network debug????");
+        //M5.Lcd.print("The index of the network is: ");
+        //M5.Lcd.println(currentNetwork.indexOf(mac));
         return currentNetwork.indexOf(mac);
       }
     }
     netFile.close();
     Serial.println("We dont think we've seen this network before");
-    M5.Lcd.println("We dont think we've seen this network before");
-    M5.Lcd.print("The index of the network is: ");
-    M5.Lcd.println(currentNetwork.indexOf(mac));
+    //M5.Lcd.println("We dont think we've seen this network before");
+    //M5.Lcd.print("The index of the network is: ");
+    //M5.Lcd.println(currentNetwork.indexOf(mac));
     return currentNetwork.indexOf(mac);
   }
   Serial.println("netFile was not true");
-  M5.Lcd.print("netFile was not true");
+  //M5.Lcd.print("netFile was not true");
 }
 
 void printHeader() {
@@ -222,10 +224,10 @@ void updateFileName() {
     memset(logFileName, 0, strlen(logFileName));
     sprintf(logFileName, "%s%d.%s", LOG_FILE_PREFIX, i, LOG_FILE_SUFFIX);
     if (!SD.exists(logFileName)) {
-      //Serial.println("we picked a new file name");
-      //Serial.println(logFileName);
-      //M5.Lcd.println("we picked a new file name");
-      //M5.Lcd.println(logFileName);
+      Serial.println("we picked a new file name");
+      Serial.println(logFileName);
+      M5.Lcd.println("we picked a new file name");
+      M5.Lcd.println(logFileName);
       break;
     } else {
       Serial.print(logFileName);
