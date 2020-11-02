@@ -13,9 +13,74 @@
 #define LOG_RATE 500
 #define NOTE_DH2 661
 
+//Start BLE shit
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEScan.h>
+#include <BLEAdvertisedDevice.h>
+
+
+//end ble shit
+
+
 char logFileName[13];
 int totalNetworks = 0;
 unsigned long lastLog = 0;
+
+//start generic ble shit setup stuff
+
+BLEScan* pBLEScan;
+
+class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
+    void onResult(BLEAdvertisedDevice advertisedDevice) {
+      Serial.printf("Advertised Device: %s", advertisedDevice.toString().c_str());
+      
+      if (advertisedDevice.haveRSSI()){
+        Serial.printf(" Rssi: %d \n", (int)advertisedDevice.getRSSI());
+      }
+      else Serial.printf("\n");
+      //start wigler csv copy section for ble logging
+      File logFile = SD.open(logFileName, FILE_APPEND);
+        
+        logFile.print(advertisedDevice.getAddress().toString());
+        logFile.print(',');
+        logFile.print((int)advertisedDevice.getName()());
+        logFile.print(',');
+        logFile.print('Misc [LE]');
+        logFile.print(',');
+        logFile.print(tinyGPS.date.year());
+        logFile.print('-');
+        logFile.print(tinyGPS.date.month());
+        logFile.print('-');
+        logFile.print(tinyGPS.date.day());
+        logFile.print(' ');
+        logFile.print(tinyGPS.time.hour());
+        logFile.print(':');
+        logFile.print(tinyGPS.time.minute());
+        logFile.print(':');
+        logFile.print(tinyGPS.time.second());
+        logFile.print(',');
+        logFile.print('0');
+        logFile.print(',');
+        logFile.print((int)advertisedDevice.getRSSI());
+        logFile.print(',');
+        logFile.print(tinyGPS.location.lat(), 6);
+        logFile.print(',');
+        logFile.print(tinyGPS.location.lng(), 6);
+        logFile.print(',');
+        logFile.print(tinyGPS.altitude.meters(), 1);
+        logFile.print(',');
+        logFile.print((tinyGPS.hdop.value(), 1));
+        logFile.print(',');
+        logFile.print("BLE");
+        logFile.println();
+        logFile.close();
+      }
+    };
+};
+
+
+
 
 const String wigleHeaderFileFormat = "WigleWifi-1.4,appRelease=2.26,model=Feather,release=0.0.0,device=arduinoWardriving,display=3fea5e7,board=esp8266,brand=Adafruit";
 char * log_col_names[LOG_COLUMN_COUNT] = {
@@ -46,6 +111,14 @@ void setup() {
   delay(500);
   updateFileName();
   printHeader();
+
+  //more ble shit
+  BLEDevice::init("");
+  pBLEScan = BLEDevice::getScan(); //create new scan
+  pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
+  pBLEScan->setActiveScan(true); //active scan uses more power, but get results faster
+  pBLEScan->setInterval(100);
+  pBLEScan->setWindow(99);  // less or equal setInterval value
 }
 
 void loop() {
@@ -75,6 +148,14 @@ void loop() {
         M5.Lcd.print("Failed Checksum: ");
         M5.Lcd.println(tinyGPS.failedChecksum());
       }
+    //Main BLE shit
+    // put your main code here, to run repeatedly:
+  BLEScanResults foundDevices = pBLEScan->start(15, false);
+  Serial.print("Devices found: ");
+  Serial.println(foundDevices.getCount());
+  Serial.println("Scan done!");
+  pBLEScan->clearResults();   // delete results fromBLEScan buffer to release memory
+  delay(2000);
     smartDelay(LOG_RATE);
 }
 
