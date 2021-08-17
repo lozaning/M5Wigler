@@ -124,17 +124,17 @@ void lookForNetworks() {
         logFile.print(',');
         logFile.print(getEncryption(i));
         logFile.print(',');
-        logFile.print(tinyGPS.date.year());
-        logFile.print('-');
-        logFile.print(tinyGPS.date.month());
-        logFile.print('-');
-        logFile.print(tinyGPS.date.day());
+        
+        char formattedDate[10];
+        sprintf(formattedDate, "%d-%02d-%02d", tinyGPS.date.year(), tinyGPS.date.month(), tinyGPS.date.day());
+        logFile.print(formattedDate);
+        
         logFile.print(' ');
-        logFile.print(tinyGPS.time.hour());
-        logFile.print(':');
-        logFile.print(tinyGPS.time.minute());
-        logFile.print(':');
-        logFile.print(tinyGPS.time.second());
+        
+        char formattedTime[8];
+        sprintf(formattedTime, "%02d:%02d:%02d", tinyGPS.time.hour(), tinyGPS.time.minute(), tinyGPS.time.second());
+        logFile.print(formattedTime);
+        
         logFile.print(',');
         logFile.print(WiFi.channel(i));
         logFile.print(',');
